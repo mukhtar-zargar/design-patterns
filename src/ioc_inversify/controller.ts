@@ -10,6 +10,7 @@ import {
 } from "inversify-express-utils";
 import { injectable, inject } from "inversify";
 import { NextFunction, Request, Response } from "express";
+import { boot } from "../kafka";
 
 @controller("/inversify")
 export class InversifyController implements interfaces.Controller {
@@ -25,14 +26,15 @@ export class InversifyController implements interfaces.Controller {
     return id;
   }
 
-  @httpGet("/")
+  @httpGet("/kafka-msg")
   private async create(
     @request() req: Request,
     @response() res: Response
   ): Promise<{ message: string }> {
     try {
       // throw Error("Errorororor");
-      console.log(req.body);
+      // console.log(req.body);
+      boot().catch((err) => console.log("kafka error", err));
       res.status(200);
       return {
         message: "Success"
