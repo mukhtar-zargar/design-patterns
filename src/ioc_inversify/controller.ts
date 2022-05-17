@@ -10,7 +10,7 @@ import {
 } from "inversify-express-utils";
 import { injectable, inject } from "inversify";
 import { NextFunction, Request, Response } from "express";
-import { boot } from "../kafka";
+import { boot } from "../kafka/producer";
 
 @controller("/inversify")
 export class InversifyController implements interfaces.Controller {

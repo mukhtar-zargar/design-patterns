@@ -1,8 +1,9 @@
-import { Kafka } from "kafkajs";
+import { Kafka, logLevel } from "kafkajs";
 
 const kafkaClient = new Kafka({
   clientId: "design-patterns-app",
-  brokers: ["localhost:9092"]
+  brokers: ["localhost:9092"],
+  logLevel: logLevel.WARN
 });
 
 const topics = {
@@ -27,21 +28,23 @@ const makeProducer = async () => {
   await producer.connect();
   return {
     send: async (payload) => {
-      const messages = Array(getRandomNumber())
-        .fill(null)
-        .map((_) => createMessage(getRandomNumber()));
+      // const messages = Array(getRandomNumber())
+      //   .fill(null)
+      //   .map((_) => createMessage(getRandomNumber()));
 
-      const requestId = requestNumber++;
-      msgNumber += messages.length;
-      kafkaClient
-        .logger()
-        .info(`Sending ${messages.length} messages #${requestId}...`);
+      // const requestId = requestNumber++;
+      // msgNumber += messages.length;
+      // kafkaClient
+      //   .logger()
+      //   .info(`Sending ${messages.length} messages #${requestId}...`);
 
       console.log("sending...");
       await producer.send({
         topic: topics.default,
-        messages: messages
+        acks: 1,
+        messages: [{ key: String(msgNumber), value: "message" + msgNumber }]
       });
+      msgNumber++;
       console.log("sent: ok!");
     },
     disconnect: () => producer.disconnect()
@@ -54,6 +57,10 @@ export const boot = async () => {
   intervalId = setInterval(() => producer1.send("sending-msg"), 3000);
   // await producer1.send("sending-msg");
 };
+
+boot().catch((err) => {
+  console.error("error in producer: ", err);
+});
 
 // const errorTypes = ["unhandledRejection", "uncaughtException"];
 // const signalTraps = ["SIGTERM", "SIGINT", "SIGUSR2"];
